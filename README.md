@@ -48,3 +48,15 @@ on metal with multi-tenant security
 
 # Introducing the Private Container Service
 ## Shannon Williams, Co-founder at Rancher Labs
+
+organisation adoption
+usually want some sort of container service
+to allow more than just developer adoption
+
+container service
+* abstracting away:
+    * computing resources (at different providers)
+    * orchestration and SDN, discovery, LB, storage)
+* allow integrating with ci/cd tools and config management
+
+cloud66, AWS ECS, Rancher
