@@ -167,9 +167,49 @@ Replication controller makes sure expected state is maintained per label
 Google Container Engine: hosted kubernetes, no need to worry about master HA
 
 # LXD - The container lighter visor
-## Canonical
+## Stéphane Graber, Canonical
 
 wrapper on top of LXC, simple REST API, command line tool
 run full OS/system in container not app containers
 their idea is to run CoreOs or your host with the docker engine in an LXD container
 coming: safe live migration, lxd on snappy
+
+# Docker network performance in the public cloud
+## Arjan Schaaf, Luminis
+
+* Kubernetes and CoreOS on Azure vs AWS
+* qperf: short running test
+* iperf3: longer running tests, parallel connections
+* containers: arjanschaaf/centos-iperf3
+* bandwith, latency - amazon is better
+
+* options:
+connect over the host interface
+use sdn: weave, flannel, calico
+before docker 1.7 - replace docker bridge or proxy in fron of docker deamon
+1.7 - libnetwork
+
+SDN functionality:
+encryption & DNS (weave)
+libnetwork and/or kubernetes support
+Flannel & Weave - overlay
+Calico - L2/L3
+
+Flannel:
+by CoreOS, easy setup, different backend, UDP, AWS VPC, VXLAN
+weabe: DNS, proxy based, different backend: pcap, VXLAN
+calico: vRouters connecte over BGP routes,
+no overlay when running L2/L3 but IPIP tunnel on AWS (or plbic cloud)
+
+bandwith: flannel VXLAN superfast, calico, weave
+latency: weave is higher
+
+native vs sdn: network bandwith + latency is not too bad
+but CPU usage can get higher, e.g Flannel UDP but VXLAN still rocks
+calico kind of in the middle
+looking forward weave VXLAN
+Calico upcoming nice kubernetes integration
+
+Flannel VXLAN rocks
+
+synthethic tests vs real test with applications
