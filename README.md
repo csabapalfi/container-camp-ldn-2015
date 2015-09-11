@@ -1,123 +1,141 @@
+!(logo)[logo.png]
+
 # Towards a Containerized Future
 ## Bryan Cantrill, Joyent
 
-chroot (7th ed unix) -> bsd jails -> solaris zones
- -> security -> workload consolidation
-OS virtualization requires OS modification (can't just everyone be on Solaris)
+### beginnings
 
-HW virtualization - OS level is hard, OS heavy, complex, HW virt became defacto standard, even in the 60s SW is heavier than HW
-IBM1401 is a cockroach, virt is lie
+* chroot (7th ed unix) -> bsd jails -> solaris zones
+* beginning -> security -> workload consolidation
+
+
+### hardware virtualization?
+
+* OS virtualization is hard and not everyone is on Solaris
+* HW virtualization - OS level is hard, OS heavy, complex,
+* HW virt became defacto standard
+* actually even in the 60s SW is heavier than HW
+
+### containers strike back
 
 Joyent OS level virt (container) since 2006
 SmartOS (based on Solaris zones)
 dotCloud: containers as PaaS foundations, docker
 
-docker: appeals to developers
-docker will do to apt what apt did to tar
+### docker: appeals to developers
 
-deploying containers to VM is god is angry Wrong
-pets vs cattle, docker hosts are pets even if your containers re cattle
-next step: container native infrastructure
+### docker will do to apt what apt did to tar
 
-problems:
-docker is linux centric
-SmartOS solver lx-based zones, run linux binaries on SmartOS
-Docker engine in Paas control plane - bad idea
+### deploying containers to VM is 'god is angry' WRONG
 
-the power of the interface
-George Stephenson - railway gauge size, victorian hackernews
-demo day, MP hit by train, funeral makes it viral
+* pets vs cattle
+* docker hosts are pets even if your containers are cattle
+* next step: container native infrastructure
+* mentioned [VMWare Bonneville](https://blogs.vmware.com/cloudnative/introducing-project-bonneville/)
 
-twistlock inventor, shipping container
-standard interface is POWER
+### current problems for Joyent
 
-docker remote API, expressive, modern, robust,
-triton: docker API -> SmartDataCenter, containers on metal
+* docker is linux centric
+* SmartOS solver lx-based zones, run linux binaries on SmartOS
+* Docker engine in Paas control plane - bad idea
 
-container landscape
-it's the future, it's clear
-upstack - fight, lots of choice, service discovery, composition, SDN
-unlikely monopoly, all open source
+### aside: the power of the interface
 
-not just compute, Joyent Manta storage service
-break down many-to-one container-VM relationship
-[VMWare Bonneville](https://blogs.vmware.com/cloudnative/introducing-project-bonneville/)
+* George Stephenson - railway gauge size, victorian hackernews
+* demo day, MP hit by train, funeral makes it viral
+* twistlock inventor, shipping container
+* **standard interface is POWER**
 
-future:
-on metal with multi-tenant security
+### docker remote API
+
+* expressive, modern, robust,
+* triton: docker API -> SmartDataCenter, containers on metal
+
+### container landscape
+* it's the future, it's clear
+* upstack - fight, lots of choice, service discovery, composition, SDN
+* unlikely monopoly, all open source
+* not just compute, Joyent Manta storage service
+
+### break down many-to-one container-VM relationship
+* future: on metal with multi-tenant security
 
 # Introducing the Private Container Service
 ## Shannon Williams, Rancher Labs
 
-organisation adoption
-usually want some sort of container service
-to allow more than just developer adoption
+### organisation adoption
 
-container service
+* usually want some sort of container service
+* to allow more than just developer adoption
+
+### container service
+
 * abstracting away:
     * computing resources (at different providers)
     * orchestration and SDN, discovery, LB, storage)
 * allow integrating with ci/cd tools and config management
 
-cloud66, AWS ECS, Rancher
+* cloud66, AWS ECS, Rancher
 
 # Distributed systems with (almost) no consensus
 ## Bryan Boreham, Weave
 
-making a world a better place through paxos - no
-'the server' is experiencing issues
-anything with more than one container is distributed, to make it reliable
-state has to be replicated
-8 fallacies of dist systems by bill joy + 'hosts stay up forever'
+> 'the server' is experiencing issues - nope
 
-what to do?
+* anything with more than one container is distributed
+* to make it reliable state has to be replicated somehow
+* 8 fallacies of dist systems by bill joy + 'hosts stay up forever'
 
-off the shelf: etcd, consul
-gets complex, consensus algorithms: paxos, raft
+### what to do?
 
-cost of consensus:
+* off the shelf: etcd, consul
+* gets complex, consensus algorithms: paxos, raft
+
+### cost of consensus:
 * network roundtrips
 * partitions (without majority) make you unavailable
-> raftscope, weavescope
 
-engineering: picking tradeoffs, weave relies on some other way
+> mentioned: raftscope, weavescope
 
-why weave cares:
-service discovery via DNS
-IP allocation
+### engineering: picking tradeoffs
 
-paxos, raft -> algorithms
-how about data structure centric?
+### why weave cares about consensus
 
-how important that all nodes are up-to-date?
-serv discovery -> node crash, list of out-to-date
-IP alloc -> most nodes don't care about all allocation
+* service discovery via DNS
+* IP allocation
+* paxos, raft -> algorithms
+* how about data structure centric?
 
-no consensus but eventual consitency
+### how important that all nodes are up-to-date?
 
-solution: CRDTs
-* consistency without consesus
-* updates can be merged in any order (merge: commutative,associative, idempotent)
+* serv discovery -> node crash, list of out-to-date
+* IP alloc -> most nodes don't care about all allocation
+* no consensus but eventual consistency is enough
 
-CRDTs applied to DNS
-each host only manipulates its own entries
-delete with tombstone, (with timeout to prevent accumulating them)
+### solution: CRDTs
 
-CRDT for IP allocation
-ring data structure, split by host
+* consistency without consensus
+* updates can be merged in any order
 
+### CRDTs applied to DNS
+* each host only manipulates its own entries
+* delete with tombstone, (with timeout to prevent accumulating them)
 
-broadcast and gossip
+### CRDT for IP allocation
+* ring data structure, split by host
+
+### broadcast vs gossip
+
 * broadcast doesn't scale, n^2
 * CRDT based systems often use gossip
 * weave adapts gossip to work with narrow links between hosts
 
-takeaways:
+### takeaways
 no consensus when you don't have to
 CRDTs are great for eventual consistency
 take great care when designing
 
-Qs:
+### Qs:
 * IP alloc bootstrap, uses simple paxos, didn't need all features, simple paxos simpler than raft
 * multicast is limited because of ops, eg. try that in AWS
 
@@ -169,10 +187,10 @@ Google Container Engine: hosted kubernetes, no need to worry about master HA
 # LXD - The container lighter visor
 ## Stéphane Graber, Canonical
 
-wrapper on top of LXC, simple REST API, command line tool
-run full OS/system in container not app containers
-their idea is to run CoreOs or your host with the docker engine in an LXD container
-coming: safe live migration, lxd on snappy
+* wrapper on top of LXC, simple REST API, command line tool
+* run full OS/system in container not app containers
+* their idea is to run CoreOs or your docker host in an LXD container
+* coming: safe live migration, lxd on snappy
 
 # Docker network performance in the public cloud
 ## Arjan Schaaf, Luminis
@@ -347,7 +365,7 @@ chaser? lua scripts
 containers/code github, docker hub ddos
 
 hyperspeed
-wasting bandwith
+wasting bandwidth
 things doesn't work offline
 IPFS - making the web p2p
 merkledag - git, content addressed data
