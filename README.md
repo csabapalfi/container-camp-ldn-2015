@@ -165,3 +165,11 @@ and type: e.g service type
 Replication controller makes sure expected state is maintained per label
 
 Google Container Engine: hosted kubernetes, no need to worry about master HA
+
+# LXD - The container lighter visor
+## Canonical
+
+wrapper on top of LXC, simple REST API, command line tool
+run full OS/system in container not app containers
+their idea is to run CoreOs or your host with the docker engine in an LXD container
+coming: safe live migration, lxd on snappy
