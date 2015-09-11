@@ -60,3 +60,63 @@ container service
 * allow integrating with ci/cd tools and config management
 
 cloud66, AWS ECS, Rancher
+
+# Distributed systems with (almost) no consensus
+## Bryan Boreham, Weave
+
+making a world a better place through paxos - no
+'the server' is experiencing issues
+anything with more than one container is distributed, to make it reliable
+state has to be replicated
+8 fallacies of dist systems by bill joy + 'hosts stay up forever'
+
+what to do?
+
+off the shelf: etcd, consul
+gets complex, consensus algorithms: paxos, raft
+
+cost of consensus:
+* network roundtrips
+* partitions (without majority) make you unavailable
+> raftscope, weavescope
+
+engineering: picking tradeoffs, weave relies on some other way
+
+why weave cares:
+service discovery via DNS
+IP allocation
+
+paxos, raft -> algorithms
+how about data structure centric?
+
+how important that all nodes are up-to-date?
+serv discovery -> node crash, list of out-to-date
+IP alloc -> most nodes don't care about all allocation
+
+no consensus but eventual consitency
+
+solution: CRDTs
+* consistency without consesus
+* updates can be merged in any order (merge: commutative,associative, idempotent)
+
+CRDTs applied to DNS
+each host only manipulates its own entries
+delete with tombstone, (with timeout to prevent accumulating them)
+
+CRDT for IP allocation
+ring data structure, split by host
+
+
+broadcast and gossip
+* broadcast doesn't scale, n^2
+* CRDT based systems often use gossip
+* weave adapts gossip to work with narrow links between hosts
+
+takeaways:
+no consensus when you don't have to
+CRDTs are great for eventual consistency
+take great care when designing
+
+Qs:
+* IP alloc bootstrap, uses simple paxos, didn't need all features, simple paxos simpler than raft
+* multicast is limited because of ops, eg. try that in AWS
