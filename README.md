@@ -269,3 +269,38 @@ docker diff, bash_history, sysdig
 warden, snort for docker
 
 more: priviliged, setuid,setguid, docker.sock, malicious images
+
+# Docker content trust
+## Diego, Docker
+
+agenda: motivation, the update framework (tuf), notary, docker content trust
+gpg is not a security framework, it's just a message format, replay attack (package from 2 years ago)
+
+TUF:
+protects against replay (everything has an expiration)
+protects against key compromise (online vs offline key)
+protect against mix and match attacks (signed collections vs. signed objects)
+
+notary implements TUF
+validates the publisher not the safety of the content
+
+separate notary-signer server holding timestamp keys
+notary server only has public data
+only publisher have the rest of the keys
+
+transparent key-rotation
+
+root of trust = TOFUs, first connection to repository, root CA certs
+
+docker content trust: built on notary
+uses pull-by-digest, because registry v2 is content addressable
+manifest -> hash chain, then pull by digest the rest of the layers
+
+DOCKER_CONTENT_TRUST=1
+pull --disable-content-trust=false
+
+(setec astronomy)
+
+default docker cli was kept simple, notary cli allows key rotation, etc.
+
+future: on by default
