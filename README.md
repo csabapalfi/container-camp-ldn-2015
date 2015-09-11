@@ -245,3 +245,27 @@ SkyDNS health Signal: short ttl, dropped name = service down
 In container registration: dinit
 
 FlagZ - dynamic flags from etcd
+
+# Lessons learnts from running potentially malicious code
+## Ben Hall, Ocelot Uproar
+
+scrapbook
+docker: no kernel virt,
+-icc - no inter cont comm
+--net=host - shutdown shuts down host!
+--ulimit nproc to prevent fork bobms
+unlimited logging
+fallocate, truncate, dd
+quota for container files dir, (/docker/aufs/, /docker/containers/../host)
+
+network:
+ngrok
+restricting bandwith (inbound/outbound), tor, torrent
+
+CPU, disk space, bandwith
+
+docker diff, bash_history, sysdig
+
+warden, snort for docker
+
+more: priviliged, setuid,setguid, docker.sock, malicious images
