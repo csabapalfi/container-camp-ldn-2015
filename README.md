@@ -120,3 +120,48 @@ take great care when designing
 Qs:
 * IP alloc bootstrap, uses simple paxos, didn't need all features, simple paxos simpler than raft
 * multicast is limited because of ops, eg. try that in AWS
+
+# Kubernetes
+## Mandy Waite, Google
+
+how to make compute resources available to engineers?
+
+dev view:
+cell: cluster to run it in
+binary: fat, statically linked, in container
+args
+resource requires
+replicas
+
+ops view:
+bazel - google build system, open source
+binary to cell storage
+config to borg scheduler per cell, creates plan
+
+prod vs nonprod priorities
+nonprod - batch jobs, can get preempted
+
+effeciency:
+limits vs actual resource usage
+dynamic reservation allows reusing requested but not reserved resources for lower priority tasks
+
+cpu vs memory to be inline, don't waste free memory of CPU100% machine
+matching machine shapes with workload shapes
+workload shapes GB mem + core
+computing tetris, bin packing
+
+DC is a cell, machines are jsut resource boundaries
+
+### Kubernetes
+
+orchestrator for docker container, supports all major cloud providers, open source, go
+manage apps not machines
+kubernetes master is not HA replicated, but can run in GCE, hosted
+
+Pod -> container or containers, or container + volumes
+when it makes sense to run 2 container on the same host
+pods have labels e.g version
+and type: e.g service type
+Replication controller makes sure expected state is maintained per label
+
+Google Container Engine: hosted kubernetes, no need to worry about master HA
