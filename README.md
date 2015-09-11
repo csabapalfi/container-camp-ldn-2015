@@ -162,7 +162,7 @@ Pod -> container or containers, or container + volumes
 when it makes sense to run 2 container on the same host
 pods have labels e.g version
 and type: e.g service type
-Replication controller makes sure expected state is maintained per label
+Replication controller makes sure expected state is maintained per label - (X replicates of pods)
 
 Google Container Engine: hosted kubernetes, no need to worry about master HA
 
@@ -176,6 +176,8 @@ coming: safe live migration, lxd on snappy
 
 # Docker network performance in the public cloud
 ## Arjan Schaaf, Luminis
+
+https://arjanschaaf.github.io/is-the-network-the-limit/
 
 * Kubernetes and CoreOS on Azure vs AWS
 * qperf: short running test
@@ -213,3 +215,33 @@ Calico upcoming nice kubernetes integration
 Flannel VXLAN rocks
 
 synthethic tests vs real test with applications
+
+# Managing Kubernetes and OpenShift with ManageIQ
+## Alissa Bonas, Red Hat
+
+containers on multiple hosts are the problem
+kubernetes + openshift + manageiq is ReadHat's answer
+Openshift 3 - built on kubernetes
+manageiq collects and correlates information about nodes, pods
+allows things like verifying/browsing image sources, etc.
+future: package version analysis, etc
+
+# Leveraging the DNS for fun and profit
+## Miek Gieben, Imporbable
+
+Reactive infrastructure
+flexible, ops light, self-heal
+etcd, SkyDNS, ELK, Prometheus
+
+SkyDNS: SRV records
+Prometheus: SRV record aware
+
+FQDN, resolv.conf search domains
+
+SkyDNS: round robin load balancing
+
+SkyDNS health Signal: short ttl, dropped name = service down
+
+In container registration: dinit
+
+FlagZ - dynamic flags from etcd
