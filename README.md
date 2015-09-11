@@ -1,5 +1,5 @@
-# Towards a Containerized Future - Bryan Cantrill
-## CTO at Joyent
+# Towards a Containerized Future
+## Bryan Cantrill, CTO at Joyent
 
 chroot (7th ed unix) -> bsd jails -> solaris zones
  -> security -> workload consolidation
@@ -46,5 +46,5 @@ break down many-to-one container-VM relationship
 future:
 on metal with multi-tenant security
 
-# Introducing the Private Container Service - Shannon Williams
-## Co-founder and VP at Rancher Labs
+# Introducing the Private Container Service
+## Shannon Williams, Co-founder at Rancher Labs
