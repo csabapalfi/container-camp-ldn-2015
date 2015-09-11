@@ -1,5 +1,5 @@
 # Towards a Containerized Future
-## Bryan Cantrill, CTO at Joyent
+## Bryan Cantrill, Joyent
 
 chroot (7th ed unix) -> bsd jails -> solaris zones
  -> security -> workload consolidation
@@ -47,7 +47,7 @@ future:
 on metal with multi-tenant security
 
 # Introducing the Private Container Service
-## Shannon Williams, Co-founder at Rancher Labs
+## Shannon Williams, Rancher Labs
 
 organisation adoption
 usually want some sort of container service
@@ -271,7 +271,7 @@ warden, snort for docker
 more: priviliged, setuid,setguid, docker.sock, malicious images
 
 # Docker content trust
-## Diego, Docker
+## Diogo Mónica, Docker
 
 agenda: motivation, the update framework (tuf), notary, docker content trust
 gpg is not a security framework, it's just a message format, replay attack (package from 2 years ago)
@@ -304,3 +304,52 @@ pull --disable-content-trust=false
 default docker cli was kept simple, notary cli allows key rotation, etc.
 
 future: on by default
+
+# Container visibility
+## Loris Degioanni, Sysdig
+
+containers are great but inspecting them is not easy
+options: command line, cadvisor, stats API, sysdig
+
+resource usage:
+command line: ps/top/htop
+top supports CGROUPS fields
+docker ps, docker top (supports ps syntax)
+
+cadvisor
+easy to install
+nice integration with heapster (kubernetes)
+not too many metrics
+
+docker stats
+cloudwatt/docker-collect-plugin
+bit richer than cadvisor but not much more
+
+sysdig
+kernel module
+metrics can be saved to a trace file
+very much tcpdump like
+scriptable
+curses interface like htop
+
+network
+iftop/tcpdump/tshark
+sysdig
+
+disk
+iotop/lsof
+sysdig
+chaser? lua scripts
+
+# Containers at Hyperspeed
+## Protocol Labs, Juan Batiz-Benet
+
+containers/code github, docker hub ddos
+
+hyperspeed
+wasting bandwith
+things doesn't work offline
+IPFS - making the web p2p
+merkledag - git, content addressed data
+
+git - honeybadger don't care
