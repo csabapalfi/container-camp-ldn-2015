@@ -142,14 +142,14 @@ take great care when designing
 # Kubernetes
 ## Mandy Waite, Google
 
-how to make compute resources available to engineers?
+### problem: how to make compute resources available to engineers?
 
-dev view:
-cell: cluster to run it in
-binary: fat, statically linked, in container
-args
-resource requires
-replicas
+### Borg - dev view
+* cell: cluster to run it in
+* binary: fat, statically linked, in container
+* config/args
+* resource limits
+* no of replicas
 
 ops view:
 bazel - google build system, open source
@@ -326,48 +326,51 @@ future: on by default
 # Container visibility
 ## Loris Degioanni, Sysdig
 
-containers are great but inspecting them is not easy
-options: command line, cadvisor, stats API, sysdig
+* containers are great but inspecting them is not easy
+* options: command line, cadvisor, stats API, sysdig
 
-resource usage:
-command line: ps/top/htop
-top supports CGROUPS fields
-docker ps, docker top (supports ps syntax)
+### command line
+* resource usage: ps/top/htop
+* top supports CGROUPS field
+* network: iftop/tcpdump/tshark
+* disk: iotop/lsof
+* docker ps, docker top (supports ps options)
 
-cadvisor
+### cadvisor
 easy to install
 nice integration with heapster (kubernetes)
 not too many metrics
 
-docker stats
-cloudwatt/docker-collect-plugin
-bit richer than cadvisor but not much more
+### docker stats
+* cloudwatt/docker-collect-plugin
+* bit richer than cadvisor but not much more
 
-sysdig
-kernel module
-metrics can be saved to a trace file
-very much tcpdump like
-scriptable
-curses interface like htop
-
-network
-iftop/tcpdump/tshark
-sysdig
-
-disk
-iotop/lsof
-sysdig
-chaser? lua scripts
+### sysdig
+* kernel module has to be installed
+* metrics can be saved to a trace file
+* very much tcpdump like
+* scriptable
+* curses interface like htop
+* amazing, you gotta see a demo
 
 # Containers at Hyperspeed
 ## Protocol Labs, Juan Batiz-Benet
 
-containers/code github, docker hub ddos
+### centralized infrastructure is less than ideal
+* companies rely on docker hub, github
+* DDoS
+* wasting bandwidth
 
-hyperspeed
-wasting bandwidth
-things doesn't work offline
-IPFS - making the web p2p
-merkledag - git, content addressed data
+### the web
+* things doesn't work when offline
+* wasting bandwidth
 
-git - honeybadger don't care
+### IPFS - making the web p2p
+* can we take some ideas from git and bittorrent?
+* merkledag or hash-chain - with content addressed data
+* honeybadger don't care
+* [blog post here](https://ipfs.io/ipfs/QmNhFJjGcMPqpuYfxL62VVB9528NXqDNMFXiqN5bgFYiZ1/its-time-for-the-permanent-web.html)
+
+### containers+IPFS = starship
+* container images can get big (unless you use alpine :))
+* starship: IPFS for distributing container images
