@@ -16,9 +16,9 @@
 
 ### containers strike back
 
-Joyent OS level virt (container) since 2006
-SmartOS (based on Solaris zones)
-dotCloud: containers as PaaS foundations, docker
+* Joyent OS level virt (container) since 2006
+* SmartOS (based on Solaris zones)
+* dotCloud: containers as PaaS foundations, docker
 
 ### docker: appeals to developers
 
