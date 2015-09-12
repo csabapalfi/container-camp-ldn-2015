@@ -1,5 +1,3 @@
-![logo](logo.png)
-
 # Towards a Containerized Future
 ## Bryan Cantrill, Joyent
 
