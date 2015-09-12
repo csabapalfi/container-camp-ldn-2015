@@ -140,45 +140,45 @@ take great care when designing
 
 ### problem: how to make compute resources available to engineers?
 
-### Borg - dev view
+### borg: dev view
 * cell: cluster to run it in
 * binary: fat, statically linked, in container
 * config/args
 * resource limits
 * no of replicas
 
-ops view:
-bazel - google build system, open source
-binary to cell storage
-config to borg scheduler per cell, creates plan
+### borg: ops view:
+* bazel - google build system, open source
+* binary to cell storage
+* config to borg scheduler per cell
+* borglets pull binary from cell storage
 
-prod vs nonprod priorities
-nonprod - batch jobs, can get preempted
+### prod vs nonprod priorities
+* nonprod - batch jobs, can get preempted
 
-effeciency:
-limits vs actual resource usage
-dynamic reservation allows reusing requested but not reserved resources for lower priority tasks
+### effeciency
+* limits vs actual resource usage
+* dynamic reservation allows reusing requested but not reserved resources for lower priority tasks
+* don't waste free memory of CPU100% machine:
+    * matching machine shapes with workload shapes
+    * workload shapes GB mem + core
+    * computing tetris, bin packing
 
-cpu vs memory to be inline, don't waste free memory of CPU100% machine
-matching machine shapes with workload shapes
-workload shapes GB mem + core
-computing tetris, bin packing
+### DC is a cell, machines are just resource boundaries
 
-DC is a cell, machines are jsut resource boundaries
+### kubernetes: intro
+* orchestrator for docker container
+* supports all major cloud providers, open source, go
+* manage apps not machines
 
-### Kubernetes
+### kubernetes master is not HA replicated, but can run in GCE, hosted
 
-orchestrator for docker container, supports all major cloud providers, open source, go
-manage apps not machines
-kubernetes master is not HA replicated, but can run in GCE, hosted
+### kubernetes pods and replicas
 
-Pod -> container or containers, or container + volumes
-when it makes sense to run 2 container on the same host
-pods have labels e.g version
-and type: e.g service type
-Replication controller makes sure expected state is maintained per label - (X replicates of pods)
-
-Google Container Engine: hosted kubernetes, no need to worry about master HA
+* pod -> container or containers, or container + volumes
+* when it makes sense to run 2 container on the same host
+* pods have labels e.g version and type: e.g service type
+* replication controller makes sure expected state is maintained per label - (n replicas of pods)
 
 # LXD - The container lighter visor
 ## Stéphane Graber, Canonical
@@ -191,44 +191,48 @@ Google Container Engine: hosted kubernetes, no need to worry about master HA
 # Docker network performance in the public cloud
 ## Arjan Schaaf, Luminis
 
-https://arjanschaaf.github.io/is-the-network-the-limit/
+### [blog post here]( https://arjanschaaf.github.io/is-the-network-the-limit/)
 
-* Kubernetes and CoreOS on Azure vs AWS
+### test setup
+
+* Kubernetes and CoreOS on Azure vs AWS (multiple instance sizes)
 * qperf: short running test
 * iperf3: longer running tests, parallel connections
-* containers: arjanschaaf/centos-iperf3
-* bandwith, latency - amazon is better
+* containers: See arjanschaaf on docker hub and github
+* bandwith, latency - amazon seem to be better
+* Azure doesn't even publish bandwidth figures
 
-* options:
-connect over the host interface
-use sdn: weave, flannel, calico
-before docker 1.7 - replace docker bridge or proxy in fron of docker deamon
-1.7 - libnetwork
+### tested configs
 
-SDN functionality:
-encryption & DNS (weave)
-libnetwork and/or kubernetes support
-Flannel & Weave - overlay
-Calico - L2/L3
+* native or use sdn: weave, flannel, calico
+* before docker 1.7 - replace docker bridge or proxy in front
+* since 1.7 - libnetwork
 
-Flannel:
-by CoreOS, easy setup, different backend, UDP, AWS VPC, VXLAN
-weabe: DNS, proxy based, different backend: pcap, VXLAN
-calico: vRouters connecte over BGP routes,
-no overlay when running L2/L3 but IPIP tunnel on AWS (or plbic cloud)
+### SDN functionality
+* different providers, different functionality
+* libnetwork and/or kubernetes support
+* encryption & DNS (weave)
+* overlay(flannel, weave) or L2/L3 (calico)
+* different backends: UDP, VXLAN, etc
 
-bandwith: flannel VXLAN superfast, calico, weave
-latency: weave is higher
+### Calico
+* vRouters connected over BGP routes
+* running L2/L3 but on public clouds via IPIP tunnel
+* upcoming nice kubernetes integration
 
-native vs sdn: network bandwith + latency is not too bad
-but CPU usage can get higher, e.g Flannel UDP but VXLAN still rocks
-calico kind of in the middle
-looking forward weave VXLAN
-Calico upcoming nice kubernetes integration
+### Flannel
+* by coreos, easy setup, has VXLAN backend
 
-Flannel VXLAN rocks
+### Weave
+* has builtin DNS support
+* VXLAN support in progress
 
-synthethic tests vs real test with applications
+### results
+
+* measured throughput, latency, CPU
+* CPU can get significantly higher with SDNs
+* best was Flannel VXLAN
+* careful with synthetic tests, perform real test with applications
 
 # Managing Kubernetes and OpenShift with ManageIQ
 ## Alissa Bonas, Red Hat
