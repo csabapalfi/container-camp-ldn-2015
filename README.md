@@ -237,91 +237,90 @@ synthethic tests vs real test with applications
 # Managing Kubernetes and OpenShift with ManageIQ
 ## Alissa Bonas, Red Hat
 
-containers on multiple hosts are the problem
-kubernetes + openshift + manageiq is ReadHat's answer
-Openshift 3 - built on kubernetes
-manageiq collects and correlates information about nodes, pods
-allows things like verifying/browsing image sources, etc.
-future: package version analysis, etc
+* containers on multiple hosts are the problem
+* kubernetes + openshift + manageiq is RedHat's answer
+* Openshift 3 - built on kubernetes
+* manageiq collects and correlates information about nodes, pods
+* allows things like verifying/browsing image sources, etc.
+* future: package version analysis, etc
 
 # Leveraging the DNS for fun and profit
-## Miek Gieben, Imporbable
+## Miek Gieben, Improbable
 
-Reactive infrastructure
-flexible, ops light, self-heal
-etcd, SkyDNS, ELK, Prometheus
+### reactive infrastructure
+* flexible, ops light, self-heal
+* their stack: etcd, SkyDNS, ELK, Prometheus
 
-SkyDNS: SRV records
-Prometheus: SRV record aware
+### discovery
+* SkyDNS: SRV records
+* Prometheus: SRV record aware
+* FQDN, resolv.conf search domains
 
-FQDN, resolv.conf search domains
+### load balancing + health checks
+* SkyDNS: round robin load balancing
+* SkyDNS health signal: short ttl, dropped name
 
-SkyDNS: round robin load balancing
+### registration
+* newly started services have to register
+* scheduler or docker host level could work
+* but in-container can easily be health check based, no scheduler overhead, naturally with container lifecycle but requires multiprocess containers
 
-SkyDNS health Signal: short ttl, dropped name = service down
+### [dinit](https://github.com/miekg/dinit)
+* super light init system
+* also solves zombie-reaping problem
 
-In container registration: dinit
-
-FlagZ - dynamic flags from etcd
+### runtime config
+* flagz - dynamic flags from etcd
 
 # Lessons learnts from running potentially malicious code
 ## Ben Hall, Ocelot Uproar
 
-scrapbook
-docker: no kernel virt,
--icc - no inter cont comm
---net=host - shutdown shuts down host!
---ulimit nproc to prevent fork bobms
-unlimited logging
-fallocate, truncate, dd
-quota for container files dir, (/docker/aufs/, /docker/containers/../host)
+* potential security issues
+* when running untrusted code in containers (see [scrapbook](http://www.joinscrapbook.com/))
 
-network:
-ngrok
-restricting bandwith (inbound/outbound), tor, torrent
+### CPU
+* `--ulimit nproc` to prevent fork bombs
 
-CPU, disk space, bandwith
+### disk
+* watch out for ways to fill your disks: logging, fallocate, truncate, dd, also etc/hosts mounted from host!
+* set quotas for container directories
 
-docker diff, bash_history, sysdig
+### network
+* `-icc=false` no inter container communications
+* never allow `--net=host` - e.g. shutdown shuts down host!
+* restricting bandwidth is tricky
+* users running ngrok, tor, torrent, ddos attacks
 
-warden, snort for docker
+### troubleshooting/monitoring
+* docker diff, bash_history, sysdig
+* coming: the warden from Ocelot Uproar
 
-more: priviliged, setuid,setguid, docker.sock, malicious images
-
-# Docker content trust
+# Docker Content trust
 ## Diogo Mónica, Docker
 
-agenda: motivation, the update framework (tuf), notary, docker content trust
-gpg is not a security framework, it's just a message format, replay attack (package from 2 years ago)
+### The Update Framework (TUF)
+* security framework
+* protects against
+    * replay attacks - serving stale content (everything has an expiration)
+    * protects against key compromise (online vs offline key)
+    * protect against mix and match attacks (signed collections vs. signed objects)
 
-TUF:
-protects against replay (everything has an expiration)
-protects against key compromise (online vs offline key)
-protect against mix and match attacks (signed collections vs. signed objects)
+### notary implements TUF
+* not docker specific
+* separate notary-signer server holding timestamp keys
+* notary server serving content only has public data
+* only publisher has the rest of the keys
+* transparent key-rotation
 
-notary implements TUF
-validates the publisher not the safety of the content
+### docker content trust: built on notary
+* uses pull-by-digest (registry v2 is content addressable)
+* manifest -> hash chain, then pull by digest the rest of the layers
+* enable it with `DOCKER_CONTENT_TRUST=1`
+* or pull `--disable-content-trust=false`
+* default docker cli was kept simple
+* notary cli allows key rotation, etc.
 
-separate notary-signer server holding timestamp keys
-notary server only has public data
-only publisher have the rest of the keys
-
-transparent key-rotation
-
-root of trust = TOFUs, first connection to repository, root CA certs
-
-docker content trust: built on notary
-uses pull-by-digest, because registry v2 is content addressable
-manifest -> hash chain, then pull by digest the rest of the layers
-
-DOCKER_CONTENT_TRUST=1
-pull --disable-content-trust=false
-
-(setec astronomy)
-
-default docker cli was kept simple, notary cli allows key rotation, etc.
-
-future: on by default
+### future: on by default
 
 # Container visibility
 ## Loris Degioanni, Sysdig
