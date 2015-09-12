@@ -92,10 +92,8 @@ dotCloud: containers as PaaS foundations, docker
 ### cost of consensus:
 * network roundtrips
 * partitions (without majority) make you unavailable
-
+* are these the right tradeoffs?
 > mentioned: raftscope, weavescope
-
-### engineering: picking tradeoffs
 
 ### why weave cares about consensus
 
