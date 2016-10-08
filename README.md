@@ -1,375 +1,105 @@
-# Towards a Containerized Future
-## Bryan Cantrill, Joyent
+# Container Camp London 2015
 
-### beginnings
+**Update**: [videos are up here](https://www.youtube.com/playlist?list=PLcHZXHMeDzxUrNpD2Tms-zrZn9etw6JcQ).
 
-* chroot (7th ed unix) -> bsd jails -> solaris zones
-* beginning -> security -> workload consolidation
+I was at the amazing Container Camp (thanks to [YLD!](https://www.yld.io/)) and had a lot of fun. My raw notes are [on github](https://github.com/csabapalfi/container-camp-ldn-2015). See short talk summaries below.
 
+* [Bryan Cantrill, Joyent - keynote ★](#bryanc)
+* [Shannon Williams, Rancher](#shannon)
+* [Bryan Boreham, Weave - CRDTs ★](#bryanb)
+* [Mandy Waite, Google - Kubernetes](#mandy)
+* [Stéphane Graber - LXD](#stephane)
+* [Arjan Schaaf - Networking Performance](#arjan)
+* [Alissa Bonas - OpenShift, ManageIQ](#alissa)
+* [Miek Gieben - SkyDNS, dinit ★](#miek)
+* [Ben Hall - Container Security ★](#ben)
+* [Diogo Mónica - Docker Content Trust ★](#diogo)
+* [Loris Degioanni - Sysdig ★](#loris)
+* [Juan Batiz-Benet - IPFS, starship ★](#juan)
 
-### hardware virtualization?
+## <a id="bryanc"></a> Bryan Cantrill, Joyent - keynote ★
 
-* OS virtualization is hard and not everyone is on Solaris
-* HW virtualization - OS level is hard, OS heavy, complex,
-* HW virt became defacto standard
-* actually even in the 60s SW is heavier than HW
+Bryan started the conference with an energetic keynote. Took us from the beginning of chroots to Solaris zones. Then he explained how hardware virtualization still became the de-facto standard and of course we ended up at docker.
 
-### containers strike back
+Funny how we're still replaying history when running containers on VMs though. The future is **containers on bare metal** (container-native infrastructure) with multi-tenant security solved somehow.
 
-* Joyent OS level virt (container) since 2006
-* SmartOS (based on Solaris zones)
-* dotCloud: containers as PaaS foundations, docker
+## <a id="shannon"></a> Shannon Williams, Rancher
 
-### docker: appeals to developers
+Shannon talked about **organization adoption** of docker. Most of them just want a container service abstracting away computing resources and orchestration.
 
-### docker will do to apt what apt did to tar
+## <a id="bryanb"></a> Bryan Boreham, Weave - CRDTs ★
 
-### deploying containers to VM is 'god is angry' WRONG
+**Achieving consensus is costly** in distributed systems (network roundtrips, availability). Weave needs to deal with distributed state to handle **IP allocation and service discovery with DNS**. Turns out consensus (and using etcd, consul with raft) is not necessary and **eventual consistency** is enough for their case.
 
-* pets vs cattle
-* docker hosts are pets even if your containers are cattle
-* next step: container native infrastructure
-* mentioned [VMWare Bonneville](https://blogs.vmware.com/cloudnative/introducing-project-bonneville/)
+They use **[CRDTs](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type)**. Just choose your data-structure well and make sure merging in updates can happen in any order.
 
-### current problems for Joyent
+Great talk highlighting how engineering is all about choosing the right trade-offs.
 
-* docker is linux centric
-* SmartOS solver lx-based zones, run linux binaries on SmartOS
-* Docker engine in Paas control plane - bad idea
+## <a id="mandy"></a> Mandy Waite, Google - Kubernetes
 
-### aside: the power of the interface
+How to make compute resources available to engineers? **[Kubernetes](http://kubernetes.io/)** is Google's answer. It reached 1.0 in July and let's you manage apps not machines.
 
-* George Stephenson - railway gauge size, victorian hackernews
-* demo day, MP hit by train, funeral makes it viral
-* twistlock inventor, shipping container
-* **standard interface is POWER**
+Kubernetes scheduling and controller components are **not highly-available yet** (in progress). For now you can trust Google Container Engine to run them for you.
 
-### docker remote API
+## <a id="stephane"></a> Stéphane Graber, LXD
 
-* expressive, modern, robust,
-* triton: docker API -> SmartDataCenter, containers on metal
+[LXD](http://www.ubuntu.com/cloud/tools/lxd) is a wrapper on top of LXC, simple REST API, command line tool. It's aimed at running full OS/system in container not app containers. Their idea is to run CoreOs or your docker host in an LXD container.
 
-### container landscape
-* it's the future, it's clear
-* upstack - fight, lots of choice, service discovery, composition, SDN
-* unlikely monopoly, all open source
-* not just compute, Joyent Manta storage service
+## <a id="arjan"></a> Arjan Schaaf - Networking Performance
 
-### break down many-to-one container-VM relationship
-* future: on metal with multi-tenant security
+Arjan Schaaf from Luminis was measuring **networking performance** of a Kubernetes and CoreOS setup. He compared various Azure and AWS instance types and **Weave, Calico and Flannel** SDNs.
 
-# Introducing the Private Container Service
-## Shannon Williams, Rancher Labs
+**qperf** is great for quick tests. **[iperf3](https://github.com/esnet/iperf) is better for long running tests with parallel connections**. Bandwidth, latency and CPU was measured and **Flannel with VXLAN** was the winner. Weave is also working on VXLAN backend which sounds promising.
 
-### organisation adoption
+Arjan advises against **relying only on synthetic tests**. You  should really test using your application, too.
 
-* usually want some sort of container service
-* to allow more than just developer adoption
+## <a id="alissa"></a>Alissa Bonas, Red Hat - OpenShift
 
-### container service
+**[OpenShift 3](https://www.openshift.com/)** is built on Kubernetes but also adds some higher level abstractions.
 
-* abstracting away:
-    * computing resources (at different providers)
-    * orchestration and SDN, discovery, LB, storage)
-* allow integrating with ci/cd tools and config management
+**ManageIQ** collects and correlates information about nodes, pods and the hosts running them. It also allows things like monitoring and security auditing.
 
-* cloud66, AWS ECS, Rancher
+## <a id="miek"></a> Miek Gieben - SkyDNS, dinit ★
 
-# Distributed systems with (almost) no consensus
-## Bryan Boreham, Weave
+Miek showed how Improbable builds it's reactive - **flexible, ops light and self-healing** - infrastructure. Their stack includes **etcd, SkyDNS, ELK, Prometheus**.
 
-> 'the server' is experiencing issues - nope
+[SkyDNS](https://github.com/skynetservices/skydns) can solve discovery, simple load balancing and basic health signals. It also integrates well with Prometheus.
 
-* anything with more than one container is distributed
-* to make it reliable state has to be replicated somehow
-* 8 fallacies of dist systems by bill joy + 'hosts stay up forever'
+[dinit](https://github.com/miekg/dinit) is a super-light init system. Solves the zombie-reaping problem. It can also be used to enable in-container registration.
 
-### what to do?
+## <a id="ben"></a> Ben Hall - Container Security ★
 
-* off the shelf: etcd, consul
-* gets complex, consensus algorithms: paxos, raft
+Ben told us about lessons learnt while building [scrapbook](http://www.joinscrapbook.com/). It's training environments allow running arbitrary code by learners in containers.
 
-### cost of consensus:
-* network roundtrips
-* partitions (without majority) make you unavailable
-* are these the right tradeoffs?
-> mentioned: raftscope, weavescope
+Few interesting lessons included `--ulimit nproc` to disarm fork bombs. I also didn't know that `--net=host` allows **shutting down the docker host from a container**. It's worth watching out for ways how **a container can fill your disks**: logging, fallocate, truncate, dd. Also etc/hosts mounted from host and can be filled with garbage. **Network bandwith** -in and out- is also worth keeping an eye on.
 
-### why weave cares about consensus
+Tools to help recognizing malicious activity include docker diff, bash_history or sysdig. Also **The Warden** is an upcoming tool from Ocelot Uproar.
 
-* service discovery via DNS
-* IP allocation
-* paxos, raft -> algorithms
-* how about data structure centric?
+## <a id="diogo"></a> Diogo Mónica - Docker Content Trust ★
 
-### how important that all nodes are up-to-date?
+Diogo is the security lead at docker and talked about new docker 1.8 feature. It's called content trust and allows **verifying** that an image is **up-to-date** and from the **right publisher**.
 
-* serv discovery -> node crash, list of out-to-date
-* IP alloc -> most nodes don't care about all allocation
-* no consensus but eventual consistency is enough
+He started by describing **[The Update Framework (TUF)](http://theupdateframework.com/)** for secure software/content updates. It protects against:
 
-### solution: CRDTs
+* replay attacks (serving stale version) - by requiring expiration
+* key compromise - by having a separate, offline root key
+* mix and match attacks - by using signed collections
+* and more...
 
-* consistency without consensus
-* updates can be merged in any order
+**[Notary](https://github.com/docker/notary)** is an opinionated implementation of TUF by Docker Inc.
 
-### CRDTs applied to DNS
-* each host only manipulates its own entries
-* delete with tombstone, (with timeout to prevent accumulating them)
+**[Docker Content Trust](https://docs.docker.com/security/trust/content_trust/)** is built on top of notary. You can give it a go by setting `DOCKER_CONTENT_TRUST=1` or specifying `--disable-content-trust=false`. In the future this will be on by default.
 
-### CRDT for IP allocation
-* ring data structure, split by host
+## <a id="loris"></a> Loris Degioanni - Sysdig ★
 
-### broadcast vs gossip
+**Inspecting containers** resource usage, network and disk stats is not easy. Resources can be monitored with standard command line tools but sometimes difficult to get the right bits of information. **cAdvisor** is easy to install but doesn't have too many metrics. The **docker stats API** is a bit richer but sometimes even that is not enough.
 
-* broadcast doesn't scale, n^2
-* CRDT based systems often use gossip
-* weave adapts gossip to work with narrow links between hosts
+**[Sysdig](http://www.sysdig.org/)** requires a **kernel module** but it's super powerful. Metrics can be saved to a **trace file** and processed later (just like tcpdump). It also has a nice **htop-like interface**. You have to see a demo.
 
-### takeaways
-no consensus when you don't have to
-CRDTs are great for eventual consistency
-take great care when designing
+## <a id="juan"></a>Juan Batiz-Benet - IPFS, starship ★
 
-### Qs:
-* IP alloc bootstrap, uses simple paxos, didn't need all features, simple paxos simpler than raft
-* multicast is limited because of ops, eg. try that in AWS
+Juan from [Protocol Labs](http://ipn.io/) talked about how centralized infrastructure is less than ideal. Companies **rely on docker hub, github** and we all saw what a **DDoS** attack can do. We're also **wasting bandwidth** by downloading the same content from these central sources.
 
-# Kubernetes
-## Mandy Waite, Google
+**[IPFS](https://ipfs.io/)** is about switching the web to a peer-to-peer protocol. It borrows some ideas from git and bittorrent and removes the need for a central server altogether. See their [blogpost here](https://ipfs.io/ipfs/QmNhFJjGcMPqpuYfxL62VVB9528NXqDNMFXiqN5bgFYiZ1/its-time-for-the-permanent-web.html).
 
-### problem: how to make compute resources available to engineers?
-
-### borg: dev view
-* cell: cluster to run it in
-* binary: fat, statically linked, in container
-* config/args
-* resource limits
-* no of replicas
-
-### borg: ops view:
-* bazel - google build system, open source
-* binary to cell storage
-* config to borg scheduler per cell
-* borglets pull binary from cell storage
-
-### prod vs nonprod priorities
-* nonprod - batch jobs, can get preempted
-
-### effeciency
-* limits vs actual resource usage
-* dynamic reservation allows reusing requested but not reserved resources for lower priority tasks
-* don't waste free memory of CPU100% machine:
-    * matching machine shapes with workload shapes
-    * workload shapes GB mem + core
-    * computing tetris, bin packing
-
-### DC is a cell, machines are just resource boundaries
-
-### kubernetes: intro
-* orchestrator for docker container
-* supports all major cloud providers, open source, go
-* manage apps not machines
-
-### kubernetes master is not HA replicated, but can run in GCE, hosted
-
-### kubernetes pods and replicas
-
-* pod -> container or containers, or container + volumes
-* when it makes sense to run 2 container on the same host
-* pods have labels e.g version and type: e.g service type
-* replication controller makes sure expected state is maintained per label - (n replicas of pods)
-
-# LXD - The container lighter visor
-## Stéphane Graber, Canonical
-
-* wrapper on top of LXC, simple REST API, command line tool
-* run full OS/system in container not app containers
-* their idea is to run CoreOs or your docker host in an LXD container
-* coming: safe live migration, lxd on snappy
-
-# Docker network performance in the public cloud
-## Arjan Schaaf, Luminis
-
-### [blog post here]( https://arjanschaaf.github.io/is-the-network-the-limit/)
-
-### test setup
-
-* Kubernetes and CoreOS on Azure vs AWS (multiple instance sizes)
-* qperf: short running test
-* iperf3: longer running tests, parallel connections
-* containers: See arjanschaaf on docker hub and github
-* bandwith, latency - amazon seem to be better
-* Azure doesn't even publish bandwidth figures
-
-### tested configs
-
-* native or use sdn: weave, flannel, calico
-* before docker 1.7 - replace docker bridge or proxy in front
-* since 1.7 - libnetwork
-
-### SDN functionality
-* different providers, different functionality
-* libnetwork and/or kubernetes support
-* encryption & DNS (weave)
-* overlay(flannel, weave) or L2/L3 (calico)
-* different backends: UDP, VXLAN, etc
-
-### Calico
-* vRouters connected over BGP routes
-* running L2/L3 but on public clouds via IPIP tunnel
-* upcoming nice kubernetes integration
-
-### Flannel
-* by coreos, easy setup, has VXLAN backend
-
-### Weave
-* has builtin DNS support
-* VXLAN support in progress
-
-### results
-
-* measured throughput, latency, CPU
-* CPU can get significantly higher with SDNs
-* best was Flannel VXLAN
-* careful with synthetic tests, perform real test with applications
-
-# Managing Kubernetes and OpenShift with ManageIQ
-## Alissa Bonas, Red Hat
-
-* containers on multiple hosts are the problem
-* kubernetes + openshift + manageiq is RedHat's answer
-* Openshift 3 - built on kubernetes
-* manageiq collects and correlates information about nodes, pods
-* allows things like verifying/browsing image sources, etc.
-* future: package version analysis, etc
-
-# Leveraging the DNS for fun and profit
-## Miek Gieben, Improbable
-
-### reactive infrastructure
-* flexible, ops light, self-heal
-* their stack: etcd, SkyDNS, ELK, Prometheus
-
-### discovery
-* SkyDNS: SRV records
-* Prometheus: SRV record aware
-* FQDN, resolv.conf search domains
-
-### load balancing + health checks
-* SkyDNS: round robin load balancing
-* SkyDNS health signal: short ttl, dropped name
-
-### registration
-* newly started services have to register
-* scheduler or docker host level could work
-* but in-container can easily be health check based, no scheduler overhead, naturally with container lifecycle but requires multiprocess containers
-
-### [dinit](https://github.com/miekg/dinit)
-* super light init system
-* also solves zombie-reaping problem
-
-### runtime config
-* flagz - dynamic flags from etcd
-
-# Lessons learnts from running potentially malicious code
-## Ben Hall, Ocelot Uproar
-
-* potential security issues
-* when running untrusted code in containers (see [scrapbook](http://www.joinscrapbook.com/))
-
-### CPU
-* `--ulimit nproc` to prevent fork bombs
-
-### disk
-* watch out for ways to fill your disks: logging, fallocate, truncate, dd, also etc/hosts mounted from host!
-* set quotas for container directories
-
-### network
-* `-icc=false` no inter container communications
-* never allow `--net=host` - e.g. shutdown shuts down host!
-* restricting bandwidth is tricky
-* users running ngrok, tor, torrent, ddos attacks
-
-### troubleshooting/monitoring
-* docker diff, bash_history, sysdig
-* coming: the warden from Ocelot Uproar
-
-# Docker Content trust
-## Diogo Mónica, Docker
-
-### The Update Framework (TUF)
-* security framework
-* protects against
-    * replay attacks - serving stale content (everything has an expiration)
-    * protects against key compromise (online vs offline key)
-    * protect against mix and match attacks (signed collections vs. signed objects)
-
-### notary implements TUF
-* not docker specific
-* separate notary-signer server holding timestamp keys
-* notary server serving content only has public data
-* only publisher has the rest of the keys
-* transparent key-rotation
-
-### docker content trust: built on notary
-* uses pull-by-digest (registry v2 is content addressable)
-* manifest -> hash chain, then pull by digest the rest of the layers
-* enable it with `DOCKER_CONTENT_TRUST=1`
-* or pull `--disable-content-trust=false`
-* default docker cli was kept simple
-* notary cli allows key rotation, etc.
-
-### future: on by default
-
-# Container visibility
-## Loris Degioanni, Sysdig
-
-* containers are great but inspecting them is not easy
-* options: command line, cadvisor, stats API, sysdig
-
-### command line
-* resource usage: ps/top/htop
-* top supports CGROUPS field
-* network: iftop/tcpdump/tshark
-* disk: iotop/lsof
-* docker ps, docker top (supports ps options)
-
-### cadvisor
-easy to install
-nice integration with heapster (kubernetes)
-not too many metrics
-
-### docker stats
-* cloudwatt/docker-collect-plugin
-* bit richer than cadvisor but not much more
-
-### sysdig
-* kernel module has to be installed
-* metrics can be saved to a trace file
-* very much tcpdump like
-* scriptable
-* curses interface like htop
-* amazing, you gotta see a demo
-
-# Containers at Hyperspeed
-## Protocol Labs, Juan Batiz-Benet
-
-### centralized infrastructure is less than ideal
-* companies rely on docker hub, github
-* DDoS
-* wasting bandwidth
-
-### the web
-* things doesn't work when offline
-* wasting bandwidth
-
-### IPFS - making the web p2p
-* can we take some ideas from git and bittorrent?
-* merkledag or hash-chain - with content addressed data
-* honeybadger don't care
-* [blog post here](https://ipfs.io/ipfs/QmNhFJjGcMPqpuYfxL62VVB9528NXqDNMFXiqN5bgFYiZ1/its-time-for-the-permanent-web.html)
-
-### containers+IPFS = starship
-* container images can get big (unless you use alpine :))
-* starship: IPFS for distributing container images
+**starship** is a solution to make pulling and pushing images faster and more reliable by using IPFS.
