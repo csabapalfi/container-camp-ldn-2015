@@ -1,5 +1,7 @@
 # Container Camp London 2015
 
+[Csaba Palfi](https://csabapalfi.github.io), Sep 2015
+
 **Update**: [videos are up here](https://www.youtube.com/playlist?list=PLcHZXHMeDzxUrNpD2Tms-zrZn9etw6JcQ).
 
 I was at the amazing Container Camp (thanks to [YLD!](https://www.yld.io/)) and had a lot of fun. My raw notes are [on github](https://github.com/csabapalfi/container-camp-ldn-2015). See short talk summaries below.
@@ -103,3 +105,5 @@ Juan from [Protocol Labs](http://ipn.io/) talked about how centralized infrastru
 **[IPFS](https://ipfs.io/)** is about switching the web to a peer-to-peer protocol. It borrows some ideas from git and bittorrent and removes the need for a central server altogether. See their [blogpost here](https://ipfs.io/ipfs/QmNhFJjGcMPqpuYfxL62VVB9528NXqDNMFXiqN5bgFYiZ1/its-time-for-the-permanent-web.html).
 
 **starship** is a solution to make pulling and pushing images faster and more reliable by using IPFS.
+
+![](https://ga-beacon.appspot.com/UA-29212656-1/container-camp-ldn-2015?pixel)
