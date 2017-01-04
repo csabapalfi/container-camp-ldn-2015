@@ -1,4 +1,4 @@
-# Container Camp London 2015
+# 🐳 Container Camp London 2015
 
 [Csaba Palfi](https://csabapalfi.github.io), Sep 2015
 
